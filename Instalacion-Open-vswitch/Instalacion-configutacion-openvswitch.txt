@@ -1,0 +1,54 @@
+sudo apt-get update
+sudo apt-get upgrade
+wget https://www.openvswitch.org/releases/openvswitch-2.7.0.tar.gz
+tar -xvzf openvswitch-2.7.0.tar.gz
+apt-get install python-simplejson python-qt4 python-twisted-conch automake autoconf gcc uml-utilities libtool build-essential pkg-config
+apt-cache search linux-headers
+apt-get install linux-headers-4.9.0-6-rpi
+cd opemvswitch-2.7.0
+ ./boot.sh
+./configure --with-linux=/lib/modules/4.9.0-6-rpi/build
+make
+make install
+ovsdb-tool create /usr/local/etc/openvswitch/conf.db /root/openvswitch-2.7.0/vswitchd/vswitch.ovsschema
+
+ovsdb-tool create /usr/local/etc/openvswitch/conf.db vswitchd/vswitch.ovsschema
+
+
+
+
+ovs-vsctl del-br bridge
+ovs-vsctl add-br bridge 
+sudo ovs-vsctl set bridge bridge protocols=OpenFlow13
+sudo ovs-vsctl add-port bridge eth1
+sudo ovs-vsctl add-port bridge eth2
+
+fcon
+sudo ovs-vsctl set-controller bridge tcp:192.168.0.103:6633
+denyinterfaces eth0
+
+auto lo
+iface lo inet loopback
+
+auto eth0
+iface eth0 inet static
+address 192.168.0.45
+netmask 255.255.255.0
+
+auto eth1
+iface eth1 inet manual
+up ifconfig $IFACE 0.0.0.0 up
+down ifconfig $IFACE down
+
+auto eth2
+iface eth2 inet manual
+up ifconfig $IFACE 0.0.0.0 up
+down ifconfig $IFACE down
+
+sudo /usr/share/openvswitch/scripts/ovs-ctl start
+./configure --prefix=/usr --localstatedir=/var --sysconfdir=/etc
+
+sudo apt-get remove docker* 
+sudo apt-get autoremove
+sudo apt-get autoclean
+sudo rm -rf /var/www/discourse -R

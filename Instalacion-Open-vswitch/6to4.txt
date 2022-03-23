@@ -1,0 +1,39 @@
+
+auto lo
+iface lo inet loopback
+
+auto eth0
+iface eth0 inet static
+address 192.168.1.5
+netmask 255.255.255.192
+gateway 192.168.1.1
+
+iface eth0 inet6 static
+address 2001:db8:fedc:abcd::1
+netmask 64
+ wget -6 "http://[aaaa::212:7400:13cc:170]/"
+rc.local
+ipv6_enable=YES
+sudo sysctl -w net.ipv6.conf.all.forwarding=1
+sudo service radvd restart
+cd /home/pi/contiki-3.0/examples/ipv6/rpl-border-router/&&make TARGET=sky connect-router &
+radvd.conf
+interface eth0
+{
+       AdvSendAdvert on;
+       prefix 2001:db8:fedc:abcd::/64
+       {
+               AdvOnLink on;
+               AdvAutonomous on;
+        };
+        route aaaa::/64
+        {
+        };
+};
+
+
+
+
+
+
+
